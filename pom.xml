@@ -3,10 +3,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>se.atoulou.facebook.hackercup</groupId>
-  <artifactId>alphabetsoup</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
-  <name>alphabetsoup</name>
+  <artifactId>hack-scaffolding</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <name>hack-scaffolding</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -41,6 +40,9 @@
         </executions>
         <configuration>
           <mainClass>se.atoulou.facebook.hackercup.common.HackRunner</mainClass>
+          <arguments>
+            <argument>alphabetsoup</argument>
+          </arguments>
         </configuration>
       </plugin>
     </plugins>

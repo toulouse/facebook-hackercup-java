@@ -1,5 +1,6 @@
 package se.atoulou.facebook.hackercup.common;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,7 +22,7 @@ public abstract class HackApp {
     private Marker logMarker;
 
     public final void actualRun(InputStream inputStream, OutputStream outputStream) {
-        PrintWriter writer = new PrintWriter(outputStream);
+        PrintWriter writer = new PrintWriter(new BufferedOutputStream(outputStream));
         List<String> inputLines = inputStreamToList(inputStream);
 
         checkConstraints(writer, inputLines);
