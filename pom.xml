@@ -41,7 +41,7 @@
         <configuration>
           <mainClass>se.atoulou.facebook.hackercup.common.HackRunner</mainClass>
           <arguments>
-            <argument>alphabetsoup</argument>
+            <argument>billboards</argument>
           </arguments>
         </configuration>
       </plugin>

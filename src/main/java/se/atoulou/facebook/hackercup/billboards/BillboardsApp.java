@@ -18,48 +18,40 @@ public class BillboardsApp extends HackApp {
     @Inject
     private Marker logMarker;
 
+    // TODO: make this not so big and ugly
     @Override
     protected void checkConstraints(PrintWriter output, List<String> inputLines) {
         boolean size = inputLines.size() > 1 && inputLines.size() <= 20;
 
-        boolean characters = Iterables.all(inputLines, new Predicate<String>() {
+        boolean format = Iterables.all(inputLines, new Predicate<String>() {
 
             @Override
             public boolean apply(String input) {
-                return input.matches("^[a-zA-Z0-9 ]+$");
+                return input.matches("^\\d+ \\d+ [a-zA-Z0-9&&[^ ]][a-zA-Z0-9 ]*$");
             }
         });
 
-        boolean noStartingSpaces = Iterables.all(inputLines, new Predicate<String>() {
+        boolean endSpaces = Iterables.any(inputLines, new Predicate<String>() {
 
             @Override
             public boolean apply(String input) {
-                return !input.startsWith(" ");
+                return input.endsWith(" ");
             }
         });
 
-        boolean noEndingSpaces = Iterables.all(inputLines, new Predicate<String>() {
+        boolean adjacentSpaces = Iterables.any(inputLines, new Predicate<String>() {
 
             @Override
             public boolean apply(String input) {
-                return !input.endsWith(" ");
-            }
-        });
-
-        boolean noAdjacentSpaces = Iterables.all(inputLines, new Predicate<String>() {
-
-            @Override
-            public boolean apply(String input) {
-                return !input.matches("  ");
+                return input.matches("  ");
             }
         });
 
         if (assertionsEnabled()) {
             assert size;
-            assert characters;
-            assert noStartingSpaces;
-            assert noEndingSpaces;
-            assert noAdjacentSpaces;
+            assert format;
+            assert !endSpaces;
+            assert !adjacentSpaces;
         } else {
             if (!size) {
                 RuntimeException e = new IllegalArgumentException(
@@ -67,37 +59,42 @@ public class BillboardsApp extends HackApp {
                 logger.error(logMarker, "Bad input.", e);
                 throw e;
             }
-            if (noStartingSpaces) {
-                RuntimeException e = new IllegalArgumentException("Spaces at the start of the text!");
+
+            if (!format) {
+                RuntimeException e = new IllegalArgumentException("The input text is improperly formatted!");
                 logger.error(logMarker, "Bad input.", e);
                 throw e;
-
             }
-            if (noEndingSpaces) {
+
+            if (endSpaces) {
                 RuntimeException e = new IllegalArgumentException("Spaces at the end of the text!");
                 logger.error(logMarker, "Bad input.", e);
                 throw e;
-
             }
-            if (noAdjacentSpaces) {
+
+            if (adjacentSpaces) {
                 RuntimeException e = new IllegalArgumentException("Spaces adjacent in the text!");
                 logger.error(logMarker, "Bad input.", e);
                 throw e;
-
             }
 
-            if (!characters) {
-                RuntimeException e = new IllegalArgumentException("There are invalid characters in the input text!");
-                logger.error(logMarker, "Bad input.", e);
-                throw e;
-            }
         }
     }
 
     @Override
     protected void run(PrintWriter writer, List<String> inputLines) {
-        // TODO Auto-generated method stub
+        int i = 1;
+        for (String inputLine : inputLines) {
+            int answer = constrainBillboard(inputLine);
+            writer.println("Case #" + i + ": " + answer);
+            i++;
+        }
+        writer.flush();
+    }
 
+    private int constrainBillboard(String inputLine) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
 }
