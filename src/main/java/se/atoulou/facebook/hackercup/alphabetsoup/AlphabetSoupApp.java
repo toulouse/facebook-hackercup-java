@@ -28,35 +28,6 @@ public final class AlphabetSoupApp extends HackApp {
     private Marker logMarker;
 
     @Override
-    protected void checkConstraints(PrintWriter writer, List<String> inputLines) {
-        boolean size = 1 <= inputLines.size() && inputLines.size() <= 20;
-        boolean uppercase = Iterables.all(inputLines, new Predicate<String>() {
-
-            @Override
-            public boolean apply(String input) {
-                return input.matches("^[A-Z ]+$");
-            }
-        });
-
-        if (assertionsEnabled()) {
-            assert size;
-            assert uppercase;
-        } else {
-            if (!size) {
-                RuntimeException e = new IllegalArgumentException(
-                        "The number of input lines violates the specification's constraints!");
-                logger.error(logMarker, "Bad input.", e);
-                throw e;
-            }
-            if (!uppercase) {
-                RuntimeException e = new IllegalArgumentException("There are invalid characters in the input text!");
-                logger.error(logMarker, "Bad input.", e);
-                throw e;
-            }
-        }
-    }
-
-    @Override
     protected void run(PrintWriter writer, List<String> inputLines) {
         int i = 1;
         for (String inputLine : inputLines) {
@@ -65,6 +36,21 @@ public final class AlphabetSoupApp extends HackApp {
             i++;
         }
         writer.flush();
+    }
+
+    @Override
+    protected void validateConstraints(PrintWriter writer, List<String> inputLines) {
+        boolean size = 1 <= inputLines.size() && inputLines.size() <= 20;
+        boolean uppercase = Iterables.all(inputLines, new Predicate<String>() {
+    
+            @Override
+            public boolean apply(String input) {
+                return input.matches("^[A-Z ]+$");
+            }
+        });
+    
+        validateConstraint(size, "The number of input lines violates the specification's constraints!");
+        validateConstraint(uppercase, "There are invalid characters in the input text!");
     }
 
     private int calculateAnagram(String inputLine) {

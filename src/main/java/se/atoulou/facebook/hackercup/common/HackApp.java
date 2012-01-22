@@ -25,17 +25,9 @@ public abstract class HackApp {
         PrintWriter writer = new PrintWriter(new BufferedOutputStream(outputStream));
         List<String> inputLines = inputStreamToList(inputStream);
 
-        checkConstraints(writer, inputLines);
+        validateConstraints(writer, inputLines);
         run(writer, inputLines);
     }
-
-    /**
-     * Check the constraints of the input data provided.
-     * 
-     * @param output
-     * @param inputLines
-     */
-    abstract protected void checkConstraints(PrintWriter output, List<String> inputLines);
 
     /**
      * Run the problem.
@@ -47,7 +39,15 @@ public abstract class HackApp {
      */
     abstract protected void run(PrintWriter writer, List<String> inputLines);
 
-    protected void assertTrue(boolean expression, String failMessage) {
+    /**
+     * Validate the constraints of the input data provided.
+     * 
+     * @param output
+     * @param inputLines
+     */
+    abstract protected void validateConstraints(PrintWriter output, List<String> inputLines);
+
+    protected final void validateConstraint(boolean expression, String failMessage) {
         assert expression;
 
         if (!expression) {
@@ -55,17 +55,6 @@ public abstract class HackApp {
             logger.error(logMarker, "Bad input.", e);
             throw e;
         }
-    }
-
-    protected final boolean assertionsEnabled() {
-        boolean assertionsAreEnabled = false;
-        try {
-            assert assertionsAreEnabled;
-        } catch (AssertionError e) {
-            assertionsAreEnabled = true;
-        }
-
-        return assertionsAreEnabled;
     }
 
     private List<String> inputStreamToList(InputStream inputStream) {

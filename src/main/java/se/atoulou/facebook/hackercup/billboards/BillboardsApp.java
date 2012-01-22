@@ -23,52 +23,6 @@ public class BillboardsApp extends HackApp {
     private Marker logMarker;
 
     @Override
-    protected void checkConstraints(PrintWriter output, List<String> inputLines) {
-        boolean size = 1 <= inputLines.size() && inputLines.size() <= 20;
-
-        boolean format = Iterables.all(inputLines, new Predicate<String>() {
-
-            @Override
-            public boolean apply(String input) {
-                return input.matches("^\\d+ \\d+ [a-zA-Z0-9&&[^ ]][a-zA-Z0-9 ]*$");
-            }
-        });
-
-        boolean endSpaces = Iterables.any(inputLines, new Predicate<String>() {
-
-            @Override
-            public boolean apply(String input) {
-                return input.endsWith(" ");
-            }
-        });
-
-        boolean adjacentSpaces = Iterables.any(inputLines, new Predicate<String>() {
-
-            @Override
-            public boolean apply(String input) {
-                return input.matches("  ");
-            }
-        });
-
-        boolean validRanges = Iterables.all(inputLines, new Predicate<String>() {
-
-            @Override
-            public boolean apply(String input) {
-                String[] components = input.split(" ");
-                int w = Integer.parseInt(components[0]);
-                int h = Integer.parseInt(components[1]);
-                return (1 <= w && w <= 1000) && (1 <= h && h <= 1000);
-            }
-        });
-
-        assertTrue(size, "The number of input lines violates the specification's constraints!");
-        assertTrue(format, "The input text is improperly formatted!");
-        assertTrue(!endSpaces, "Spaces at the end of the text!");
-        assertTrue(!adjacentSpaces, "Spaces adjacent in the text!");
-        assertTrue(validRanges, "The input numbers have illegal ranges!");
-    }
-
-    @Override
     protected void run(PrintWriter writer, List<String> inputLines) {
         int i = 1;
         for (String inputLine : inputLines) {
@@ -77,6 +31,52 @@ public class BillboardsApp extends HackApp {
             i++;
         }
         writer.flush();
+    }
+
+    @Override
+    protected void validateConstraints(PrintWriter output, List<String> inputLines) {
+        boolean size = 1 <= inputLines.size() && inputLines.size() <= 20;
+    
+        boolean format = Iterables.all(inputLines, new Predicate<String>() {
+    
+            @Override
+            public boolean apply(String input) {
+                return input.matches("^\\d+ \\d+ [a-zA-Z0-9&&[^ ]][a-zA-Z0-9 ]*$");
+            }
+        });
+    
+        boolean endSpaces = Iterables.any(inputLines, new Predicate<String>() {
+    
+            @Override
+            public boolean apply(String input) {
+                return input.endsWith(" ");
+            }
+        });
+    
+        boolean adjacentSpaces = Iterables.any(inputLines, new Predicate<String>() {
+    
+            @Override
+            public boolean apply(String input) {
+                return input.matches("  ");
+            }
+        });
+    
+        boolean validRanges = Iterables.all(inputLines, new Predicate<String>() {
+    
+            @Override
+            public boolean apply(String input) {
+                String[] components = input.split(" ");
+                int w = Integer.parseInt(components[0]);
+                int h = Integer.parseInt(components[1]);
+                return (1 <= w && w <= 1000) && (1 <= h && h <= 1000);
+            }
+        });
+    
+        validateConstraint(size, "The number of input lines violates the specification's constraints!");
+        validateConstraint(format, "The input text is improperly formatted!");
+        validateConstraint(!endSpaces, "Spaces at the end of the text!");
+        validateConstraint(!adjacentSpaces, "Spaces adjacent in the text!");
+        validateConstraint(validRanges, "The input numbers have illegal ranges!");
     }
 
     private int constrainBillboard(String inputLine) {
@@ -102,18 +102,51 @@ public class BillboardsApp extends HackApp {
         logger.trace(logMarker, "WORD LENGTHS: {}", wordLengths);
 
         // PSEUDOCODE:
-        // for billboardLetterWidth := 1 up to text.length() {
+        // for lettersPerLine := 1 up to text.length() {
         // wrap the text into lines (involves popping and incrementing)
         // if a word cannot be wrapped, continue (more letters than the billboard is wide)
-        // if wrapping exceeds allocated height, continue (gotta cram more letters per line)
-        // add billboardLetterWidth to list of candidates
+        // add lettersPerLine to list of candidates
         // }
         // return MAXIMUM(
         // foreach candidate {
         // return calculated font size for candidate, remember to round down
+        // OR if wrapping exceeds allocated height, return zero
         // }
         // )
+
+        List<Integer> dimensionCandidates = Lists.newArrayListWithExpectedSize(text.length());
+
+        for (int lettersPerLine = 1; lettersPerLine <= text.length(); lettersPerLine++) {
+            try {
+                dimensionCandidates.add(calculateMinimumHeight(lettersPerLine, wordLengths));
+            } catch (CannotWrapException e) {
+                continue;
+            }
+        }
         return 0;
     }
 
+    private int calculateMinimumHeight(final int lettersPerLine, final List<Integer> wordLengths) {
+        int numLines = 0;
+        int spacesLeft = lettersPerLine;
+
+        for (Integer wordLength : wordLengths) {
+            if (lettersPerLine < wordLength) {
+                throw new CannotWrapException();
+            }
+
+            if (spacesLeft < wordLength) {
+                numLines++;
+                spacesLeft = lettersPerLine;
+                continue;
+            }
+
+            spacesLeft -= wordLength;
+        }
+        return numLines;
+    }
+
+    private static class CannotWrapException extends RuntimeException {
+        private static final long serialVersionUID = -2772246466214119704L;
+    }
 }
