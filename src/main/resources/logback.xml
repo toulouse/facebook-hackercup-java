@@ -3,11 +3,11 @@
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
     <file>project.log</file>
     <encoder>
-      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+      <pattern>%d{ISO8601} [%thread] [%marker] %-5level - %msg%n
       </pattern>
     </encoder>
   </appender>
-  <logger name="se.atoulou" level="TRACE" />
+  <logger name="se.atoulou" level="DEBUG" />
   <root level="debug">
     <appender-ref ref="FILE" />
   </root>
