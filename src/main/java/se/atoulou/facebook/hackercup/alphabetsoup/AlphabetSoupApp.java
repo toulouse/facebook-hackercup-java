@@ -29,7 +29,7 @@ public final class AlphabetSoupApp extends HackApp {
 
     @Override
     protected void checkConstraints(PrintWriter writer, List<String> inputLines) {
-        boolean size = inputLines.size() > 1 && inputLines.size() <= 20;
+        boolean size = 1 <= inputLines.size() && inputLines.size() <= 20;
         boolean uppercase = Iterables.all(inputLines, new Predicate<String>() {
 
             @Override

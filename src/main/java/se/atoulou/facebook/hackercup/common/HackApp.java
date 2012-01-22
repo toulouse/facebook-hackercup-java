@@ -47,6 +47,16 @@ public abstract class HackApp {
      */
     abstract protected void run(PrintWriter writer, List<String> inputLines);
 
+    protected void assertTrue(boolean expression, String failMessage) {
+        assert expression;
+
+        if (!expression) {
+            RuntimeException e = new IllegalArgumentException(failMessage);
+            logger.error(logMarker, "Bad input.", e);
+            throw e;
+        }
+    }
+
     protected final boolean assertionsEnabled() {
         boolean assertionsAreEnabled = false;
         try {
@@ -92,4 +102,5 @@ public abstract class HackApp {
 
         return inputLines;
     }
+
 }

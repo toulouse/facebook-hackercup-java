@@ -9,8 +9,11 @@ import org.slf4j.Marker;
 
 import se.atoulou.facebook.hackercup.common.HackApp;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
 public class BillboardsApp extends HackApp {
@@ -18,10 +21,9 @@ public class BillboardsApp extends HackApp {
     @Inject
     private Marker logMarker;
 
-    // TODO: make this not so big and ugly
     @Override
     protected void checkConstraints(PrintWriter output, List<String> inputLines) {
-        boolean size = inputLines.size() > 1 && inputLines.size() <= 20;
+        boolean size = 1 <= inputLines.size() && inputLines.size() <= 20;
 
         boolean format = Iterables.all(inputLines, new Predicate<String>() {
 
@@ -47,38 +49,22 @@ public class BillboardsApp extends HackApp {
             }
         });
 
-        if (assertionsEnabled()) {
-            assert size;
-            assert format;
-            assert !endSpaces;
-            assert !adjacentSpaces;
-        } else {
-            if (!size) {
-                RuntimeException e = new IllegalArgumentException(
-                        "The number of input lines violates the specification's constraints!");
-                logger.error(logMarker, "Bad input.", e);
-                throw e;
-            }
+        boolean validRanges = Iterables.all(inputLines, new Predicate<String>() {
 
-            if (!format) {
-                RuntimeException e = new IllegalArgumentException("The input text is improperly formatted!");
-                logger.error(logMarker, "Bad input.", e);
-                throw e;
+            @Override
+            public boolean apply(String input) {
+                String[] components = input.split(" ");
+                int w = Integer.parseInt(components[0]);
+                int h = Integer.parseInt(components[1]);
+                return (1 <= w && w <= 1000) && (1 <= h && h <= 1000);
             }
+        });
 
-            if (endSpaces) {
-                RuntimeException e = new IllegalArgumentException("Spaces at the end of the text!");
-                logger.error(logMarker, "Bad input.", e);
-                throw e;
-            }
-
-            if (adjacentSpaces) {
-                RuntimeException e = new IllegalArgumentException("Spaces adjacent in the text!");
-                logger.error(logMarker, "Bad input.", e);
-                throw e;
-            }
-
-        }
+        assertTrue(size, "The number of input lines violates the specification's constraints!");
+        assertTrue(format, "The input text is improperly formatted!");
+        assertTrue(!endSpaces, "Spaces at the end of the text!");
+        assertTrue(!adjacentSpaces, "Spaces adjacent in the text!");
+        assertTrue(validRanges, "The input numbers have illegal ranges!");
     }
 
     @Override
@@ -93,8 +79,27 @@ public class BillboardsApp extends HackApp {
     }
 
     private int constrainBillboard(String inputLine) {
-        // TODO Auto-generated method stub
+        List<String> components = Lists.newArrayList(Splitter.on(' ').limit(3).trimResults().omitEmptyStrings()
+                .split(inputLine));
+
+        int w = Integer.parseInt(components.get(0));
+        int h = Integer.parseInt(components.get(1));
+        String text = components.get(2);
+
+        List<String> words = Lists.newArrayList(Splitter.on(' ').split(text));
+
+        logger.trace(logMarker, "W: {} H: {} TEXT: {}", new String[] { components.get(0), components.get(1), text });
+
+        List<Integer> wordLengths = Lists.transform(words, new Function<String, Integer>() {
+
+            @Override
+            public Integer apply(String input) {
+                return input.length();
+            }
+        });
+
+        logger.trace(logMarker, "WORD LENGTHS: {}", wordLengths);
+
         return 0;
     }
-
 }
