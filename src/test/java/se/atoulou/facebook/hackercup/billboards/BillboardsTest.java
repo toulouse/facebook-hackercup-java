@@ -1,4 +1,4 @@
-package se.atoulou.facebook.hackercup.alphabetsoup;
+package se.atoulou.facebook.hackercup.billboards;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -19,14 +19,14 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 
-public class AlphabetSoupTest {
+public class BillboardsTest {
     @Before
     public void setUp() throws Exception {
     }
 
     @Test
-    public void testAlphabetSoupSampleInput() throws IOException {
-        Injector injector = Guice.createInjector(new AlphabetSoupTestModule());
+    public void testBillboardsSampleInput() throws IOException {
+        Injector injector = Guice.createInjector(new BillboardsTestModule());
 
         Key<String> inputPathKey = Key.get(String.class, Names.named("InputPath"));
         Provider<String> inputPathProvider = injector.getBinding(inputPathKey).getProvider();

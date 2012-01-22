@@ -8,7 +8,7 @@ import se.atoulou.facebook.hackercup.common.HackApp;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
-public class AlphabetSoupInjectModule extends AbstractModule {
+public class AlphabetSoupModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(HackApp.class).to(AlphabetSoupApp.class);

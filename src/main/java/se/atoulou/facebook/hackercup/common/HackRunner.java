@@ -10,7 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
-import se.atoulou.facebook.hackercup.alphabetsoup.AlphabetSoupInjectModule;
+import se.atoulou.facebook.hackercup.alphabetsoup.AlphabetSoupModule;
+import se.atoulou.facebook.hackercup.billboards.BillboardsModule;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -45,7 +46,9 @@ public class HackRunner {
         Module module;
 
         if ("alphabetsoup".equalsIgnoreCase(hackAppName)) {
-            module = new AlphabetSoupInjectModule();
+            module = new AlphabetSoupModule();
+        } else if ("billboards".equalsIgnoreCase(hackAppName)) {
+            module = new BillboardsModule();
         } else {
             logger.error(logMarker, "That problem is not recognized!");
 
