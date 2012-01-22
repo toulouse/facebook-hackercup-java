@@ -96,7 +96,7 @@ public class AnagramCalculator {
     // INPUT VERIFICATION
 
     protected void checkConstraints(List<String> inputLines) {
-        boolean size = inputLines.size() > 1 && inputLines.size() < 20;
+        boolean size = inputLines.size() > 1 && inputLines.size() <= 20;
         boolean uppercase = Iterables.all(inputLines, new Predicate<String>() {
 
             @Override
