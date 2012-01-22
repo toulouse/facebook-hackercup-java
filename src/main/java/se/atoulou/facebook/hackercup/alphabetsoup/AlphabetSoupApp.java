@@ -42,18 +42,18 @@ public final class AlphabetSoupApp extends HackApp {
     protected void validateConstraints(PrintWriter writer, List<String> inputLines) {
         boolean size = 1 <= inputLines.size() && inputLines.size() <= 20;
         boolean uppercase = Iterables.all(inputLines, new Predicate<String>() {
-    
+
             @Override
             public boolean apply(String input) {
                 return input.matches("^[A-Z ]+$");
             }
         });
-    
+
         validateConstraint(size, "The number of input lines violates the specification's constraints!");
         validateConstraint(uppercase, "There are invalid characters in the input text!");
     }
 
-    private int calculateAnagram(String inputLine) {
+    protected int calculateAnagram(String inputLine) {
         // Tree multiset used for prettiness so the debug output alphabetizes the log.
         final Multiset<Character> charactersMultiset = TreeMultiset.create(Lists.charactersOf(inputLine));
         final Multiset<Character> hackerCupMultiset = TreeMultiset.create(Lists.charactersOf("HACKERCUP"));

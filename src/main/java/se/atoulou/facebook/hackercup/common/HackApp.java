@@ -44,6 +44,7 @@ public abstract class HackApp {
      * 
      * @param output
      * @param inputLines
+     * @throws IllegalArgumentException
      */
     abstract protected void validateConstraints(PrintWriter output, List<String> inputLines);
 
@@ -80,13 +81,9 @@ public abstract class HackApp {
                 inputLines.add(line);
             }
 
-            // Error if validation failed
-            if (i > expectedInputLength) {
-                RuntimeException e = new IllegalArgumentException(
-                        "The number of input lines read doesn't match the expected number given in the data file!");
-                logger.error(logMarker, "Bad input.", e);
-                throw e;
-            }
+            // Error if validation failed. Seems to be a pretty universal constraint.
+            validateConstraint(i <= expectedInputLength,
+                    "The number of input lines read doesn't match the expected number given in the data file!");
         }
 
         return inputLines;
