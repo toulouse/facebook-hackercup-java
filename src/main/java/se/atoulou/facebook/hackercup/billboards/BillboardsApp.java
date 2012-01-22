@@ -12,6 +12,7 @@ import se.atoulou.facebook.hackercup.common.HackApp;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -79,17 +80,17 @@ public class BillboardsApp extends HackApp {
     }
 
     private int constrainBillboard(String inputLine) {
+        // Split W H T into their respective bits
         List<String> components = Lists.newArrayList(Splitter.on(' ').limit(3).trimResults().omitEmptyStrings()
                 .split(inputLine));
+
+        logger.trace(logMarker, "COMPONENTS: {}", components);
 
         int w = Integer.parseInt(components.get(0));
         int h = Integer.parseInt(components.get(1));
         String text = components.get(2);
 
-        List<String> words = Lists.newArrayList(Splitter.on(' ').split(text));
-
-        logger.trace(logMarker, "W: {} H: {} TEXT: {}", new String[] { components.get(0), components.get(1), text });
-
+        List<String> words = ImmutableList.copyOf(Splitter.on(' ').split(text));
         List<Integer> wordLengths = Lists.transform(words, new Function<String, Integer>() {
 
             @Override
@@ -100,6 +101,19 @@ public class BillboardsApp extends HackApp {
 
         logger.trace(logMarker, "WORD LENGTHS: {}", wordLengths);
 
+        // PSEUDOCODE:
+        // for billboardLetterWidth := 1 up to text.length() {
+        // wrap the text into lines (involves popping and incrementing)
+        // if a word cannot be wrapped, continue (more letters than the billboard is wide)
+        // if wrapping exceeds allocated height, continue (gotta cram more letters per line)
+        // add billboardLetterWidth to list of candidates
+        // }
+        // return MAXIMUM(
+        // foreach candidate {
+        // return calculated font size for candidate, remember to round down
+        // }
+        // )
         return 0;
     }
+
 }
