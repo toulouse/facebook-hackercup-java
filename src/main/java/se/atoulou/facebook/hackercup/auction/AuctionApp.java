@@ -26,7 +26,7 @@ import com.google.inject.Inject;
  * @author toulouse
  */
 public class AuctionApp extends HackApp {
-    private static final boolean useHackyMemoizingRecursive = true;
+    private static final boolean useMemoizingRecursive = true;
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionApp.class);
     @Inject
@@ -45,10 +45,9 @@ public class AuctionApp extends HackApp {
             logger.trace(logMarker, "Evaluating Auction {}: {}", new String[] { String.valueOf(i), entry.toString() });
             AuctionEvaluation answer = evaluateAuctionEntry(entry);
             writer.println("Case #" + i + ": " + answer.getTerribleDeals() + " " + answer.getBargains());
+            writer.flush();
             i++;
         }
-        writer.flush();
-
     }
 
     @Override
@@ -57,15 +56,15 @@ public class AuctionApp extends HackApp {
     }
 
     protected AuctionEntry entryFromStringList(List<String> stringList) {
-        List<Integer> intList = Lists.transform(stringList, new Function<String, Integer>() {
+        List<Long> longList = Lists.transform(stringList, new Function<String, Long>() {
 
             @Override
-            public Integer apply(String input) {
-                return Integer.valueOf(input);
+            public Long apply(String input) {
+                return Long.valueOf(input);
             }
         });
-        return new AuctionEntry(intList.get(0), intList.get(1), intList.get(2), intList.get(3), intList.get(4),
-                intList.get(5), intList.get(6), intList.get(7), intList.get(8));
+        return new AuctionEntry(longList.get(0), longList.get(1), longList.get(2), longList.get(3), longList.get(4),
+                longList.get(5), longList.get(6), longList.get(7), longList.get(8));
     }
 
     // Handwavey diagram explanation:
@@ -75,22 +74,17 @@ public class AuctionApp extends HackApp {
     // |B| | where B = strictly better
     // +-+-+
     protected AuctionEvaluation evaluateAuctionEntry(AuctionEntry entry) {
-        final int n = entry.getN();
+        final long n = entry.getN();
 
-        TreeMap<Integer, Integer> lowestWeightForPrices = new TreeMap<Integer, Integer>();
-        TreeMap<Integer, Integer> highestWeightForPrices = new TreeMap<Integer, Integer>();
+        Map<Long, Long> lowestWeightForPrices = new TreeMap<Long, Long>();
+        Map<Long, Long> highestWeightForPrices = new TreeMap<Long, Long>();
 
-        // DEBUG
-        // Table<Integer, Integer, Integer> products = TreeBasedTable.create();
+        for (long product_i = 1; product_i <= n; product_i++) {
+            final long myPrice = getPrice(entry, product_i);
+            final long myWeight = getWeight(entry, product_i);
 
-        for (int product_i = 1; product_i <= n; product_i++) {
-            final int myPrice = getPrice(entry, product_i);
-            final int myWeight = getWeight(entry, product_i);
-
-            // products.put(myPrice, myWeight, product_i);
-
-            Integer storedLowestWeight = lowestWeightForPrices.get(myPrice);
-            Integer storedHighestWeight = highestWeightForPrices.get(myPrice);
+            Long storedLowestWeight = lowestWeightForPrices.get(myPrice);
+            Long storedHighestWeight = highestWeightForPrices.get(myPrice);
 
             if (storedLowestWeight == null || myWeight < storedLowestWeight) {
                 lowestWeightForPrices.put(myPrice, myWeight);
@@ -104,19 +98,13 @@ public class AuctionApp extends HackApp {
         int bargains = 0;
         int terribleDeals = 0;
 
-        // logger.info("products {}", products);
-        // System.out.println("/");
-        // for (Table.Cell<Integer, Integer, Integer> cell : products.cellSet()) {
-        // System.out.println(cell.getRowKey() + "," + cell.getColumnKey() + "," + cell.getValue());
-        // }
-
-        for (int product_k = 1; product_k <= n; product_k++) {
-            int myPrice = getPrice(entry, product_k);
-            int myWeight = getWeight(entry, product_k);
+        for (long product_k = 1; product_k <= n; product_k++) {
+            long myPrice = getPrice(entry, product_k);
+            long myWeight = getWeight(entry, product_k);
 
             boolean nothingIsStrictlyBetter = true;
-            for (Integer price : lowestWeightForPrices.keySet()) {
-                Integer lowestWeightForPrice = lowestWeightForPrices.get(price);
+            for (Long price : lowestWeightForPrices.keySet()) {
+                Long lowestWeightForPrice = lowestWeightForPrices.get(price);
 
                 if (price > myPrice) { // Only checking things with a LESSER OR EQUAL price.
                     continue;
@@ -136,8 +124,8 @@ public class AuctionApp extends HackApp {
             }
 
             boolean nothingIsStrictlyWorse = true;
-            for (Integer price : highestWeightForPrices.keySet()) {
-                Integer highestWeightForPrice = highestWeightForPrices.get(price);
+            for (Long price : highestWeightForPrices.keySet()) {
+                Long highestWeightForPrice = highestWeightForPrices.get(price);
 
                 if (price < myPrice) { // Only check things with a EQUAL OR GREATER price
                     continue;
@@ -170,61 +158,61 @@ public class AuctionApp extends HackApp {
         return new AuctionEvaluation(terribleDeals, bargains);
     }
 
-    protected int getPrice(AuctionEntry entry, int i) {
-        if (useHackyMemoizingRecursive) {
+    protected long getPrice(AuctionEntry entry, long i) {
+        if (useMemoizingRecursive) {
             return getPriceRecursive(entry, i);
         } else {
             return getPriceBuggy(entry, i);
         }
     }
 
-    protected int getWeight(AuctionEntry entry, int i) {
-        if (useHackyMemoizingRecursive) {
+    protected long getWeight(AuctionEntry entry, long i) {
+        if (useMemoizingRecursive) {
             return getWeightRecursive(entry, i);
         } else {
             return getWeightBuggy(entry, i);
         }
     }
 
-    Map<Integer, Integer> memoizedPrices = new HashMap<Integer, Integer>();
+    Map<Long, Long> memoizedPrices = new HashMap<Long, Long>();
 
-    protected int getPriceRecursive(AuctionEntry entry, int i) {
-        Integer memoizedResult = memoizedPrices.get(i);
+    protected long getPriceRecursive(AuctionEntry entry, long i) {
+        Long memoizedResult = memoizedPrices.get(i);
         if (memoizedResult != null) {
             return memoizedResult;
         }
 
-        final int a = entry.getA();
-        final int b = entry.getB();
-        final int m = entry.getM();
+        final long a = entry.getA();
+        final long b = entry.getB();
+        final long m = entry.getM();
 
         if (i == 1) { // Base case
             return entry.getP_1();
         }
 
-        final int result = 1 + (b + a * getPriceRecursive(entry, i - 1)) % m;
+        final long result = 1 + (b + a * getPriceRecursive(entry, i - 1)) % m;
         memoizedPrices.put(i, result);
         return result;
 
     }
 
-    Map<Integer, Integer> memoizedWeights = new HashMap<Integer, Integer>();
+    Map<Long, Long> memoizedWeights = new HashMap<Long, Long>();
 
-    protected int getWeightRecursive(AuctionEntry entry, int i) {
-        Integer memoizedResult = memoizedWeights.get(i);
+    protected long getWeightRecursive(AuctionEntry entry, long i) {
+        Long memoizedResult = memoizedWeights.get(i);
         if (memoizedResult != null) {
             return memoizedResult;
         }
 
-        final int c = entry.getC();
-        final int d = entry.getD();
-        final int k = entry.getK();
+        final long c = entry.getC();
+        final long d = entry.getD();
+        final long k = entry.getK();
 
         if (i == 1) { // Base case
             return entry.getW_1();
         }
 
-        final int result = 1 + (d + c * getWeightRecursive(entry, i - 1)) % k;
+        final long result = 1 + (d + c * getWeightRecursive(entry, i - 1)) % k;
         memoizedWeights.put(i, result);
         return result;
     }
@@ -243,23 +231,20 @@ public class AuctionApp extends HackApp {
      * @param i
      * @return
      */
-    protected int getPriceBuggy(AuctionEntry entry, int i) {
-        final long a = entry.getA().longValue();
-        final long b = entry.getB().longValue();
-        final long m = entry.getM().longValue();
-        final long p_1 = entry.getP_1().longValue();
+    protected long getPriceBuggy(AuctionEntry entry, long i) {
+        final long a = entry.getA();
+        final long b = entry.getB();
+        final long m = entry.getM();
+        final long p_1 = entry.getP_1();
 
         // Calculate A^i MOD M. Pray that I'm not fucking up because of primeness or something
-        long aimodm = modExp(a, i, m);
+        final long aimodm = modExp(a, i, m);
 
         long result = 1;
         result = result + (p_1 * aimodm * a) % m;
         result = result + (b * (aimodm + 1)) % m;
 
-        // Loss of precision not a problem since we know the input of m is actually int-sized.
-        int realResult = (int) result;
-
-        return realResult;
+        return result;
     }
 
     /**
@@ -269,11 +254,11 @@ public class AuctionApp extends HackApp {
      * @param i
      * @return
      */
-    protected int getWeightBuggy(AuctionEntry entry, int i) {
-        final long c = entry.getC().longValue();
-        final long d = entry.getD().longValue();
-        final long k = entry.getK().longValue();
-        final long w_1 = entry.getW_1().longValue();
+    protected long getWeightBuggy(AuctionEntry entry, long i) {
+        final long c = entry.getC();
+        final long d = entry.getD();
+        final long k = entry.getK();
+        final long w_1 = entry.getW_1();
 
         // Calculate C^i MOD K. Pray that I'm not fucking up because of primeness or something
         long cimodk = modExp(c, i, k);
@@ -282,10 +267,7 @@ public class AuctionApp extends HackApp {
         result = result + (w_1 * cimodk * c) % k;
         result = result + (d * (cimodk + 1)) % k;
 
-        // Loss of precision not a problem since we know the input of m is actually int-sized.
-        int realResult = (int) result;
-
-        return realResult;
+        return result;
     }
 
     protected long modExp(final long baseNumber, final long exponent, final long modulus) {
