@@ -90,6 +90,13 @@ public class BillboardsApp extends HackApp {
         validateConstraint(validRanges, "The input numbers have illegal ranges!");
     }
 
+    /**
+     * The problem solution.
+     * 
+     * @param inputLine
+     *            input line of text, including width and height
+     * @return the best font size
+     */
     protected Integer constrainBillboard(String inputLine) {
         // Split W H T into their respective bits
         List<String> components = Lists.newArrayList(Splitter.on(' ').limit(3).trimResults().omitEmptyStrings()
@@ -101,7 +108,7 @@ public class BillboardsApp extends HackApp {
         final int h = Integer.parseInt(components.get(1));
         final String text = components.get(2);
 
-        // PSEUDOCODE:
+        // GENERAL PSEUDOCODE:
         // for lettersPerLine := 1 up to text.length() {
         // wrap the text into lines
         // if a word cannot be wrapped, continue (more letters than the billboard is wide)
@@ -132,6 +139,13 @@ public class BillboardsApp extends HackApp {
         return Collections.max(fontSizes);
     }
 
+    /**
+     * Transform a list of words into a list of word lengths since the strings themselves are irrelevant
+     * 
+     * @param text
+     *            input text
+     * @return list of word lengths
+     */
     protected List<Integer> getWordLengths(String text) {
         List<String> words = ImmutableList.copyOf(Splitter.on(' ').split(text));
         List<Integer> wordLengths = Lists.transform(words, new Function<String, Integer>() {
@@ -145,12 +159,21 @@ public class BillboardsApp extends HackApp {
         return wordLengths;
     }
 
+    /**
+     * Calculate all the possible text dimensions that will fit wrappings of the text.
+     * 
+     * @param textLength
+     *            length of the input text, i.e. the maximum possible line length
+     * @param wordLengths
+     *            list of word lengths to calculate the possible wrap dimensions for
+     * @return A list of text dimensions
+     */
     protected List<TextDimension> getViableDimensions(int textLength, List<Integer> wordLengths) {
         Table<Height, Width, Boolean> validPositions = TreeBasedTable.create(); // height, width, isCandidate
 
         for (int lettersPerLine = 1; lettersPerLine <= textLength; lettersPerLine++) {
             try {
-                Integer minimumHeight = calculateMinimumHeight(lettersPerLine, wordLengths);
+                Integer minimumHeight = Integer.valueOf(calculateMinimumHeight(lettersPerLine, wordLengths));
                 validPositions.put(new Height(minimumHeight), new Width(lettersPerLine), Boolean.TRUE);
             } catch (CannotWrapException e) {
                 continue;
@@ -167,6 +190,15 @@ public class BillboardsApp extends HackApp {
         return ImmutableList.copyOf(dimensionCandidates);
     }
 
+    /**
+     * Calculate the minimum possible number of lines we can display given a list of word lengths and allowable number of letters per line.
+     * 
+     * @param lettersPerLine
+     *            number of letters allowed per line
+     * @param wordLengths
+     *            list of word lengths to wrap onto lines
+     * @return An integer number of lines
+     */
     protected int calculateMinimumHeight(final int lettersPerLine, final List<Integer> wordLengths) {
         int numLines = 1;
         int spacesLeft = lettersPerLine;
@@ -189,7 +221,18 @@ public class BillboardsApp extends HackApp {
         return numLines;
     };
 
-    protected Integer constrainFontSizeOnBoardToTextDimensions(int w, int h, TextDimension textDimension) {
+    /**
+     * Calculate the largest font size that doesn't overflow horizontally or vertically.
+     * 
+     * @param w
+     *            board width
+     * @param h
+     *            board height
+     * @param textDimension
+     *            dimensions of the text we're constraining, i.e. 4 letters by 3 lines
+     * @return An integer font size
+     */
+    protected int constrainFontSizeOnBoardToTextDimensions(int w, int h, TextDimension textDimension) {
         // We don't expect any negative numbers so normal truncating division == flooring division
         int maxFontWidth = w / textDimension.getWidth().get();
         int maxFontHeight = h / textDimension.getHeight().get();
