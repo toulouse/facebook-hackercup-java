@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import javax.inject.Provider;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import se.atoulou.facebook.hackercup.common.HackApp;
@@ -20,10 +19,6 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 
 public class AlphabetSoupTest {
-    @Before
-    public void setUp() throws Exception {
-    }
-
     @Test
     public void testAlphabetSoupSampleInput() throws IOException {
         Injector injector = Guice.createInjector(new AlphabetSoupTestModule());
