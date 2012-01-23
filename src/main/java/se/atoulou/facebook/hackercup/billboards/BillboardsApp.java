@@ -9,10 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
-import se.atoulou.facebook.hackercup.billboards.typesafety.CannotWrapException;
-import se.atoulou.facebook.hackercup.billboards.typesafety.Height;
+import se.atoulou.facebook.hackercup.billboards.typesafety.LineCount;
 import se.atoulou.facebook.hackercup.billboards.typesafety.TextDimension;
-import se.atoulou.facebook.hackercup.billboards.typesafety.Width;
+import se.atoulou.facebook.hackercup.billboards.typesafety.LineWidth;
 import se.atoulou.facebook.hackercup.common.HackApp;
 
 import com.google.common.base.Function;
@@ -169,22 +168,25 @@ public class BillboardsApp extends HackApp {
      * @return A list of text dimensions
      */
     protected List<TextDimension> getViableDimensions(int textLength, List<Integer> wordLengths) {
-        Table<Height, Width, Boolean> validPositions = TreeBasedTable.create(); // height, width, isCandidate
+        // Since this can be sparse there's no big deal doing this vs, say, a map.
+        Table<LineCount, LineWidth, Boolean> viableDimensions = TreeBasedTable.create(); // height, width, isCandidate
 
         for (int lettersPerLine = 1; lettersPerLine <= textLength; lettersPerLine++) {
-            try {
-                Integer minimumHeight = Integer.valueOf(calculateMinimumHeight(lettersPerLine, wordLengths));
-                validPositions.put(new Height(minimumHeight), new Width(lettersPerLine), Boolean.TRUE);
-            } catch (CannotWrapException e) {
+            // Short-circuit early if there's no way we'll be able to wrap this one
+            Integer biggestWordLength = Collections.max(wordLengths);
+            if (biggestWordLength > lettersPerLine) {
                 continue;
             }
+
+            Integer minimumLineCount = Integer.valueOf(getMinimumLineCount(lettersPerLine, wordLengths));
+            viableDimensions.put(new LineCount(minimumLineCount), new LineWidth(lettersPerLine), Boolean.TRUE);
         }
 
-        List<TextDimension> dimensionCandidates = Lists.newArrayListWithExpectedSize(validPositions.size());
-        for (Height height : validPositions.rowKeySet()) {
-            Map<Width, Boolean> validWidthsForHeight = validPositions.row(height);
-            Width mostConstrainingWidth = Collections.min(validWidthsForHeight.keySet());
-            dimensionCandidates.add(new TextDimension(mostConstrainingWidth, height));
+        List<TextDimension> dimensionCandidates = Lists.newArrayListWithExpectedSize(viableDimensions.size());
+        for (LineCount height : viableDimensions.rowKeySet()) {
+            Map<LineWidth, Boolean> validWidthsForHeight = viableDimensions.row(height);
+            LineWidth mostConstrainingWidth = Collections.min(validWidthsForHeight.keySet());
+            dimensionCandidates.add(new TextDimension(height, mostConstrainingWidth));
         }
 
         return ImmutableList.copyOf(dimensionCandidates);
@@ -199,15 +201,11 @@ public class BillboardsApp extends HackApp {
      *            list of word lengths to wrap onto lines
      * @return An integer number of lines
      */
-    protected int calculateMinimumHeight(final int lettersPerLine, final List<Integer> wordLengths) {
+    protected int getMinimumLineCount(final int lettersPerLine, final List<Integer> wordLengths) {
         int numLines = 1;
         int spacesLeft = lettersPerLine;
 
         for (Integer wordLength : wordLengths) {
-            if (lettersPerLine < wordLength) { // Word cannot fit on billboard
-                throw new CannotWrapException();
-            }
-
             if (wordLength <= spacesLeft) { // Space is available for the word.
                 // Account for spaces.
                 spacesLeft -= (wordLength + 1);
@@ -224,6 +222,8 @@ public class BillboardsApp extends HackApp {
     /**
      * Calculate the largest font size that doesn't overflow horizontally or vertically.
      * 
+     * NB: returns zero if the font cannot fit.
+     * 
      * @param w
      *            board width
      * @param h
@@ -234,8 +234,8 @@ public class BillboardsApp extends HackApp {
      */
     protected int constrainFontSizeOnBoardToTextDimensions(int w, int h, TextDimension textDimension) {
         // We don't expect any negative numbers so normal truncating division == flooring division
-        int maxFontWidth = w / textDimension.getWidth().get();
-        int maxFontHeight = h / textDimension.getHeight().get();
+        int maxFontWidth = w / textDimension.getLineWidth().get();
+        int maxFontHeight = h / textDimension.getLineCount().get();
 
         // Since the font is square we've got to pick the smaller of the two dimensions, since the bigger one won't fit.
         return Math.min(maxFontWidth, maxFontHeight);

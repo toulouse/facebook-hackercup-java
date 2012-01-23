@@ -2,10 +2,10 @@ package se.atoulou.facebook.hackercup.billboards.typesafety;
 
 import com.google.common.collect.ForwardingObject;
 
-public final class Width extends ForwardingObject implements Comparable<Width> {
+public final class LineWidth extends ForwardingObject implements Comparable<LineWidth> {
     private final Integer num;
 
-    public Width(Integer num) {
+    public LineWidth(Integer num) {
         this.num = num;
     }
 
@@ -15,7 +15,7 @@ public final class Width extends ForwardingObject implements Comparable<Width> {
     }
 
     @Override
-    public int compareTo(Width o) {
+    public int compareTo(LineWidth o) {
         return num.compareTo(o.num);
     }
 
