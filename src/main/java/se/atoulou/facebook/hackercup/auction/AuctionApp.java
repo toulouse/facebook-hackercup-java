@@ -5,6 +5,11 @@ import java.util.List;
 
 import se.atoulou.facebook.hackercup.common.HackApp;
 
+/**
+ * The Auction hack app.
+ * 
+ * @author toulouse
+ */
 public class AuctionApp extends HackApp {
 
     @Override

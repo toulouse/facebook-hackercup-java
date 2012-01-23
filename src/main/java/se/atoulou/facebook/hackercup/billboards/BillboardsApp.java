@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import se.atoulou.facebook.hackercup.billboards.typesafety.LineCount;
-import se.atoulou.facebook.hackercup.billboards.typesafety.TextDimension;
 import se.atoulou.facebook.hackercup.billboards.typesafety.LineWidth;
+import se.atoulou.facebook.hackercup.billboards.typesafety.TextDimension;
 import se.atoulou.facebook.hackercup.common.HackApp;
 
 import com.google.common.base.Function;
@@ -24,6 +24,11 @@ import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
 import com.google.inject.Inject;
 
+/**
+ * The Billboard hack app.
+ * 
+ * @author toulouse
+ */
 public class BillboardsApp extends HackApp {
     private static final Logger logger = LoggerFactory.getLogger(BillboardsApp.class);
     @Inject
