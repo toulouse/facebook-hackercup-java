@@ -41,7 +41,7 @@
         <configuration>
           <mainClass>se.atoulou.facebook.hackercup.common.HackRunner</mainClass>
           <arguments>
-            <argument>billboards</argument>
+            <argument>auction</argument>
           </arguments>
         </configuration>
       </plugin>
