@@ -1,2 +1,1 @@
-To run, 'mvn clean compile' followed by 'mvn exec:java'. It will pick up the input file located in
-the appropriate directory within src/main/resources/se/atoulou/facebook/hackercup/.
+To run, 'mvn clean compile' followed by 'mvn exec:java'. It will pick up the input file located in the appropriate directory within src/main/resources/se/atoulou/facebook/hackercup/.
