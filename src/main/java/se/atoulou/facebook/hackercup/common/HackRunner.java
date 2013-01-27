@@ -1,5 +1,7 @@
 package se.atoulou.facebook.hackercup.common;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -17,12 +19,18 @@ public class HackRunner {
     public static void main(String[] args) {
         logger.error("That problem is not recognized!");
 
-        logger.debug("Locating input file.");
+        logger.debug("Preparing input file.");
         String inputPath = "se/atoulou/facebook/hackercup/beautifulstrings/input.txt";
-
-        logger.debug("Preparing input/output streams.");
         InputStream in = HackRunner.class.getClassLoader().getResourceAsStream(inputPath);
-        OutputStream out = System.out;
+
+        logger.debug("Preparing output file.");
+        OutputStream out;
+        try {
+            out = new FileOutputStream("output.txt");
+        } catch (FileNotFoundException e) {
+            logger.error("Error creating output file.", e);
+            throw new RuntimeException(e);
+        }
 
         HackApp app = new BeautifulStringsApp();
 

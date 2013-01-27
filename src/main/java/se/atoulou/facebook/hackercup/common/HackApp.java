@@ -49,17 +49,12 @@ public abstract class HackApp {
         final List<String> inputLines = Lists.newArrayListWithExpectedSize(expectedInputLength);
 
         // Not using String line : lines because I treat line #1 differently
-        for (int i = 1; i < rawLines.length; i++) {
+        for (int i = 1; i < rawLines.length && i <= expectedInputLength; i++) {
             // What if the input ends with an empty line?
             String line = rawLines[i];
             if (!line.isEmpty()) {
                 inputLines.add(line);
             }
-
-        }
-
-        if (inputLines.size() < expectedInputLength) {
-            logger.error("The number of input lines read doesn't match the expected number given in the data file!");
         }
         return inputLines;
     }
