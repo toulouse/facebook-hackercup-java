@@ -3,3 +3,7 @@ Case #2: 754
 Case #3: 491
 Case #4: 729
 Case #5: 646
+Case #6: 351
+Case #7: 75
+Case #8: 77
+Case #9: 52
