@@ -20,8 +20,6 @@ public abstract class HackApp {
     public final void actualRun(InputStream inputStream, OutputStream outputStream) {
         PrintWriter writer = new PrintWriter(new BufferedOutputStream(outputStream));
         List<String> inputLines = inputStreamToList(inputStream);
-
-        validateConstraints(writer, inputLines);
         run(writer, inputLines);
     }
 
@@ -34,25 +32,6 @@ public abstract class HackApp {
      *            A list of strings representing the input lines.
      */
     abstract protected void run(PrintWriter writer, List<String> inputLines);
-
-    /**
-     * Validate the constraints of the input data provided.
-     * 
-     * @param output
-     * @param inputLines
-     * @throws IllegalArgumentException
-     */
-    abstract protected void validateConstraints(PrintWriter output, List<String> inputLines);
-
-    protected final void validateConstraint(boolean expression, String failMessage) {
-        assert expression;
-
-        if (!expression) {
-            RuntimeException e = new IllegalArgumentException(failMessage);
-            logger.error("Bad input.", e);
-            throw e;
-        }
-    }
 
     private List<String> inputStreamToList(InputStream inputStream) {
         String inputString;
@@ -82,10 +61,10 @@ public abstract class HackApp {
 
             // Error if validation failed. Seems to be a pretty universal
             // constraint.
-            validateConstraint(i <= expectedInputLength,
-                    "The number of input lines read doesn't match the expected number given in the data file!");
+            if (i <= expectedInputLength) {
+                logger.error("The number of input lines read doesn't match the expected number given in the data file!");
+            }
         }
-
         return inputLines;
     }
 }

@@ -12,11 +12,4 @@ public class BeautifulStringsApp extends HackApp {
         // TODO Auto-generated method stub
 
     }
-
-    @Override
-    protected void validateConstraints(PrintWriter output, List<String> inputLines) {
-        // TODO Auto-generated method stub
-
-    }
-
 }
