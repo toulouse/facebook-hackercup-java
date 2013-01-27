@@ -43,10 +43,7 @@ public abstract class HackApp {
             throw new RuntimeException(e);
         }
 
-        String[] rawLines = inputString.split("\\r?\\n"); // Alternatively
-                                                          // (untested),
-                                                          // "[\\r\\n]+" to skip
-                                                          // empty lines
+        String[] rawLines = inputString.split("\\r?\\n"); // Alternatively (untested), "[\\r\\n]+" to skip empty lines
 
         int expectedInputLength = Integer.parseInt(rawLines[0]);
         final List<String> inputLines = Lists.newArrayListWithExpectedSize(expectedInputLength);
@@ -59,11 +56,10 @@ public abstract class HackApp {
                 inputLines.add(line);
             }
 
-            // Error if validation failed. Seems to be a pretty universal
-            // constraint.
-            if (i <= expectedInputLength) {
-                logger.error("The number of input lines read doesn't match the expected number given in the data file!");
-            }
+        }
+
+        if (inputLines.size() < expectedInputLength) {
+            logger.error("The number of input lines read doesn't match the expected number given in the data file!");
         }
         return inputLines;
     }
