@@ -41,35 +41,28 @@
         <configuration>
           <mainClass>se.atoulou.facebook.hackercup.common.HackRunner</mainClass>
           <arguments>
-            <argument>auction</argument>
+            <argument>beautifulstrings</argument>
           </arguments>
         </configuration>
       </plugin>
     </plugins>
   </build>
   <dependencies>
-    <!-- This is as much a tool for my own learning as it is for hacking 
-      so I'm playing with some fun libraries here. -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.8.1</version>
+      <version>4.11</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>11.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.inject</groupId>
-      <artifactId>guice</artifactId>
-      <version>3.0</version>
+      <version>14.0-rc1</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.9</version>
     </dependency>
   </dependencies>
 </project>
